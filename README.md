@@ -3,7 +3,7 @@
 <!-- This repository contains the Python code to reproduce the results of the paper [In-context learning for model-free system identification](http://arxiv.org/abs/2308.13380)
 by Matteo Rufolo, Dario Piga, Marco Forgione. -->
 
-In this repository we address the robustness characteristic in the model-free in-context learning architecture introduced here [In-context learning for model-free system identification](https://arxiv.org/abs/2410.03291) for System Identification, where a *meta model* is trained to describe an entire class of dynamical systems.
+In this repository we address the robustness characteristic in the model-free in-context learning architecture introduced here [robust in-context learning for model-free system identification](https://arxiv.org/abs/2410.03291) for System Identification, where a *meta model* is trained to describe an entire class of dynamical systems.
 We focus on analyzing the same optimization problem, but from a task distribution perspective, prioritizing tasks with higher losses during training, thereby focusing on the most potentially problematic cases.
 
 <!-- 
