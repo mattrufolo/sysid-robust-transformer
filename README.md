@@ -19,7 +19,7 @@ $$\phi^* = \arg \min_{\phi} \mathbb{E}_{p_\alpha(\mathcal{D}, \phi)}\left[-\log 
 We employ the same Transformer architecture of the original paper:
 
 <!-- ![machine-translation-like model-free simulation](fig/encoder_decoder_architecture.png "Generalized multi-step-ahead simulation") -->
-<img src="figure/encoder_decoder_architecture.pdf"  width="1400">
+<img src="figure/encoder_decoder_architecture.png"  width="1400">
 
 # Main files
 
