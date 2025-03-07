@@ -1,0 +1,11 @@
+numpy
+torch
+scipy
+pandas
+matplotlib
+tdqm
+numba
+pandas
+copy
+nonlinear_benchmarks
+ 
