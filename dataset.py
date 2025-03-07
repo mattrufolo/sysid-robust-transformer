@@ -5,6 +5,52 @@ from numpy import empty
 from torch.utils.data import DataLoader, IterableDataset
 from lti import drss_matrices, dlsim, nn_fun
 
+def generate_random_binary_signal_rep(choices,min_repetitions, max_repetitions,length, input_RNG): 
+    #INPUT RNG GOOD?
+    '''
+    It create a binary signal of dimension length picking the elements from 
+    the list choices, constraining the signal to be formed by subsequences with
+    the same element of length between min_repetitions and max_repetitions
+    Args:
+        choices: list of the 2 possible choices to pick the elements 
+        min_repetitions: minimum number of repetitions in subsequence
+        max_repetitions: maximum number of repetitions in subsequence
+        length: total length of the signal
+        input_RNG:
+    Return:
+        vec: the binary signal that satisfy the different conditions
+    '''
+    assert min_repetitions<=max_repetitions, "The minimum number of repetitions of the same value has to be smaller of the maximum one"
+    assert len(choices) == 2, "We want only two possible choices, to create a binary signal"
+    assert length>min_repetitions, "In order to not have infinite loops in the script"
+    # chose randomly one element of choices, and repeat it in an appropriate way randomly
+    rep = int(input_RNG.uniform(min_repetitions,max_repetitions))
+    vec = []
+    first_choice = [input_RNG.choice(choices)]
+    vec = first_choice*rep
+    #pick the other element in choices
+    choice = [choices[np.where(np.array(first_choice*2)!=np.array(choices))[0][0]]]
+    flag = True
+    while flag:
+        # compute how many times to repeat it and comput the remamining in order to not have problems with the dimension of length
+        rep = int(input_RNG.uniform(min_repetitions,max_repetitions))
+        remaining = length-len(vec)-rep
+        if remaining>=min_repetitions and remaining<=max_repetitions:
+            # if the remaining is between the min and max, you append rep in the vector, and continue the remaining with the other choice
+            vec= np.concatenate([vec,choice*rep])
+            other_choice = [choices[np.where(np.array(choice*2)!=np.array(choices))[0][0]]]
+            vec = np.concatenate([vec,other_choice*remaining])
+            flag = False
+        elif remaining>max_repetitions:
+            # if is far from the ending, so you append normally in the vector
+            vec = np.concatenate([vec,choice*rep])
+            first_choice = choice
+            choice = [choices[np.where(np.array(first_choice*2)!=np.array(choices))[0][0]]]
+
+        #if anything is not good you have to pick another number of ripetition until appropriate
+    
+    return vec
+            
 
 def generate_input(rng, batch_size=1, N=1000, p_low_pass=0.5, p_high_pass=0.05):
     """
@@ -60,8 +106,6 @@ def generate_input(rng, batch_size=1, N=1000, p_low_pass=0.5, p_high_pass=0.05):
     u *= np.sqrt((N // 2 + 1) / (fmax - fmin + 1) * N)
 
     return u, uf, fmin, fmax
-
-
 
 
 
@@ -174,13 +218,13 @@ class WHDataset(IterableDataset):
 
             # To generate the PRBS input (pseudo random binary signal)
             # choices = [-1.0,1.0]
-            # u = CSTR_F.generate_random_binary_signal_rep(choices,20,80,self.seq_len + n_skip, self.input_rng)
+            # u = generate_random_binary_signal_rep(choices,20,80,self.seq_len + n_skip, self.input_rng)
             # u = np.array([[i] for i in u])
             # To generate the white noise input signal
-            u = self.input_rng.normal(size=(self.seq_len + n_skip, 1))
+            # u = self.input_rng.normal(size=(self.seq_len + n_skip, 1))
 
-            # u = generate_input(batch_size=1, N=self.seq_len + n_skip, p_low_pass=0.5, p_high_pass=0.05,
-            #                    rng=self.input_rng)[0].reshape(-1, 1)
+            u = generate_input(batch_size=1, N=self.seq_len + n_skip, p_low_pass=0.5, p_high_pass=0.05,
+                               rng=self.input_rng)[0].reshape(-1, 1)
 
             # G1
             y1 = dlsim(*G1, u)
@@ -250,8 +294,7 @@ if __name__ == "__main__":
     mdlargs = {"strictly_proper":True, "mag_range": (0.8, 0.97), "phase_range": (0, math.pi / 2)}
     #train_ds = LinearDynamicalDataset(nx=5, nu=1, ny=1, seq_len=500, **mdlargs)
 
-    train_ds = CSTRDataset(shift_seed=42, input_seed=445)
-    # train_ds = LinearDynamicalDataset(nx=5, nu=2, ny=3, seq_len=1000)
+    train_ds = LinearDynamicalDataset(nx=5, nu=2, ny=3, seq_len=1000)
     train_dl = DataLoader(train_ds, batch_size=2)
     batch_y, batch_u = next(iter(train_dl))
     print(batch_y.shape, batch_u.shape)
