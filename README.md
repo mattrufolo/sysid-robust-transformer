@@ -71,6 +71,10 @@ pip install wandb # (optional, for experiment logging & monitoring)
 While all the scripts can run on CPU, execution may be frustratingly slow. For faster training, a GPU is highly recommended.
 To run the paper's examples, we used a server equipped with an nVidia RTX 3090 GPU.
 
+# Additional documentation
+
+In the folder doc/paper it is possible to find a .pdf file that report an extended version of the paper, that report additional analysis and results with respect to the submitted one.
+
 
 # Citing
 
